@@ -1,0 +1,79 @@
+.Button {
+    display: inline-block;
+    height: $input-height;
+    margin-right: 5px;
+    padding: $button-padding;
+    border: 2px solid transparent;
+    border-radius: $border-radius;
+    background-color: $button-color-primary;
+    color: $button-color-primary-text;
+    font-family: $button-font-family;
+    font-size: $button-font-size;
+    font-weight: $button-font-weight;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: background 200ms ease;
+    appearance: none;
+
+    &:last-child {
+        margin-right: 0;
+    }
+
+    &:hover {
+        background-color: darken($button-color-primary, 10%);
+        color: $button-color-primary-text;
+        text-decoration: none;
+        outline: none;
+    }
+
+    &._rounded {
+        border-radius: $input-height / 2 ;
+    }
+
+    &._upper {
+        font-size: $font-size-small - 2px;
+        letter-spacing: 1px;
+    }
+
+    &:disabled,
+    &._disabled {
+        opacity: .7;
+        color: rgba($button-color-primary-text, 1);
+        cursor: default;
+
+        &:hover {
+            background-color: $button-color-primary;
+        }
+    }
+
+    &._outline {
+        &,
+        &:disabled,
+        &._disabled {
+            border: 2px solid $button-color-primary;
+            background: none;
+            color: $button-color-primary;
+        }
+
+        &:hover {
+            border-color: darken($button-color-primary, 20%);
+            color: darken($button-color-primary, 20%);
+
+            &:disabled,
+            &._disabled {
+                border-color: $button-color-primary;
+                color: $button-color-primary;
+            }
+        }
+    }
+
+    &._secondary {
+        @include button($button-color-secondary-text, $button-color-secondary);
+    }
+}
+
+a.Button {
+    line-height: $input-height - 4px;
+}

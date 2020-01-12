@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<title>Diet</title>
+
+	<link rel="stylesheet" href="assets/fonts/fontello/css/fontello.css">
+	<link rel="stylesheet" href="assets/css/monalisa.min.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+	<div class="container" id="app">
+		<div class="Row _gutters">
+			<!-- Cardapios -->
+			<div class="col _col-8">
+				<table class="Table">
+					<tbody>
+						<tr>
+							<td class="_align-middle">
+								<h2 class="_mb0">Cardápio</h2>
+							</td>
+							<td class="_tar _w10">
+								<b>Calorias</b><br> 0 kcal
+							</td>
+							<td class="_tar _w10">
+								<b>Carb</b><br> 0
+							</td>
+							<td class="_tar _w10">
+								<b>Prot</b><br> 0
+							</td>
+							<td class="_tar _w10">
+								<b>Gord</b><br> 0
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<table class="Table _bordered">
+					<tbody>
+						<tr>
+							<td class="_align-middle">
+								<h4 class="_mb0">
+									<span contenteditable>Café da manhã</span>
+									<button class="Button _mini"><i class="icon-trash"></i></button>
+								</h4>
+							</td>
+							<td class="_tar _w10">
+								<b>Calorias</b><br> 0 kcal
+							</td>
+							<td class="_tar _w10">
+								<b>Carb</b><br> 0
+							</td>
+							<td class="_tar _w10">
+								<b>Prot</b><br> 0
+							</td>
+							<td class="_tar _w10">
+								<b>Gord</b><br> 0
+							</td>
+						</tr>
+
+						<tr class="_align-middle">
+							<td colspan="3">Maçã</td>
+							<td>
+								<input type="text" placeholder="qtd">
+							</td>
+							<td class="_tac">
+								<button class="Button _mini"><i class="icon-trash"></i></button>
+							</td>
+						</tr>
+
+						<tr>
+							<td colspan="5">
+								<a href="#">Adicionar alimento</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<a class="Button" href="#">Adicionar refeição</a>
+			</div>
+
+			<!-- Perfil -->
+			<div class="col _col-4">
+				<h2>Perfil</h2>
+				<form class="Form">
+					<div class="form-item">
+						<label>Idade</label>
+						<div>
+							<input type="number" min="0" v-model="perfil.idade">
+						</div>
+					</div>
+
+					<div class="form-item">
+						<label>Peso (kg)</label>
+						<div>
+							<input type="number" min="0" v-model="perfil.peso">
+						</div>
+					</div>
+
+					<div class="form-item">
+						<label>Altura (cm)</label>
+						<div>
+							<input type="number" min="0" v-model="perfil.altura">
+						</div>
+					</div>
+
+					<div class="form-item">
+						<label>Sexo</label>
+						<div>
+							<select v-model="perfil.genero">
+								<option value="m">Masculino</option>
+								<option value="f">Feminino</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-item">
+						<label>Nível de atividade física</label>
+						<div>
+							<select v-model="perfil.atividade">
+								<option value="1.2">Sedentário</option>
+								<option value="1.375">Leve</option>
+								<option value="1.5">Moderado</option>
+								<option value="1.725">Alto</option>
+								<option value="1.9">Atleta</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-item">
+						<label>Objetivo</label>
+						<div>
+							<select v-model="perfil.objetivo">
+								<option value="1.25">Ganhar peso</option>
+								<option value="1">Manter o peso</option>
+								<option value="0.75">Perder peso</option>
+							</select>
+						</div>
+					</div>
+				</form>
+
+				<!-- Tabela resumo -->
+				<table class="Table _bordered">
+					<tbody>
+						<tr>
+							<td class="_w70"><b>TMB</b></td>
+							<td class="_w30 _tar">{{ calorias.tmb }} kcal</td>
+						</tr>
+
+						<tr>
+							<td><b>Consumo necessário de calorias</b></td>
+							<td class="_tar">{{ calorias.necessario }} kcal</td>
+						</tr>
+
+						<tr>
+							<td><b>Meta consumo de calorias</b></td>
+							<td class="_tar">{{ calorias.meta }} kcal</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script>
+		var app = new Vue({
+
+			el: '#app',
+
+			data: {
+				perfil: {
+					idade: 0,
+					peso: 0,
+					altura: 0,
+					genero: 'm',
+					atividade: 1.2,
+					objetivo: 1
+				}
+			},
+
+			computed: {
+				calorias: function() {
+					let peso       = this.perfil.peso;
+					let altura     = this.perfil.altura;
+					let idade      = this.perfil.idade;
+					let genero     = this.perfil.genero;
+					let atividade  = this.perfil.atividade;
+					let objetivo   = this.perfil.objetivo;
+					let fator      = (genero == 'm') ? 5 : -161;
+					let tmb        = 0;
+					let necessario = 0;
+					let meta       = 0;
+
+					if (peso && altura && idade) {
+						tmb        = (10 * peso) + (6.25 * altura) - (5 * idade) + fator;
+						tmb        = Math.round(tmb);
+						necessario = Math.round(atividade * tmb);
+						meta       = Math.round(necessario * objetivo)
+					}
+
+					return {
+						tmb: tmb,
+						necessario: necessario,
+						meta: meta,
+					}
+				}
+			},
+
+			methods: {
+			}
+
+		});
+	</script>
+</body>
+</html>

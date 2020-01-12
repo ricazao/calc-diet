@@ -1,0 +1,29 @@
+{
+    "name": "@vesperabr/monalisa",
+    "title": "Monalisa",
+    "version": "3.2.2",
+    "description": "Simple and efficient CSS framework.",
+    "author": "Véspera Tecnologia",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vesperabr/monalisa"
+    },
+    "license": "MIT",
+    "css": "dist/css/Monalisa.css",
+    "sass": "dist/scss/Monalisa.scss",
+    "main": "dist/js/Monalisa.js",
+    "dependencies": {},
+    "devDependencies": {
+        "autoprefixer": "^9.6.1",
+        "gulp": "^4.0.2",
+        "gulp-clean-css": "^4.2.0",
+        "gulp-concat": "^2.6.1",
+        "gulp-newer": "^1.4.0",
+        "gulp-notify": "^3.2.0",
+        "gulp-plumber": "^1.2.1",
+        "gulp-postcss": "^8.0.0",
+        "gulp-rename": "^1.4.0",
+        "gulp-sass": "^4.0.2",
+        "gulp-uglify": "^3.0.2"
+    }
+}

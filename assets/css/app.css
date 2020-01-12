@@ -1,0 +1,12 @@
+.container {
+	width: 1170px;
+	margin: 20px auto;
+}
+
+.Button._mini {
+	background: #eee;
+	color: #666;
+	padding: 0 4px;
+	height: 24px;
+	font-size: 10px;
+}
