@@ -12,8 +12,9 @@
 
 	<div class="container" id="app">
 		<div class="Row _gutters">
-			<!-- Cardapios -->
-			<div class="col _col-8">
+			<!-- Conteudo -->
+			<div class="col _col-9">
+				<!-- Total -->
 				<table class="Table">
 					<tbody>
 						<tr>
@@ -21,56 +22,67 @@
 								<h2 class="_mb0">Cardápio</h2>
 							</td>
 							<td class="_tar _w10">
-								<b>Calorias</b><br> 0 kcal
+								<b>Calorias</b><br> 
+								<small>{{ totalCalorias }} kcal<br> 0%</small>
 							</td>
 							<td class="_tar _w10">
-								<b>Carb</b><br> 0
+								<b>Carb</b><br> 
+								<small>{{ totalCarb }}g<br> 0%</small>
 							</td>
 							<td class="_tar _w10">
-								<b>Prot</b><br> 0
+								<b>Prot</b><br> 
+								<small>{{ totalProt }}g<br> 0%</small>
 							</td>
 							<td class="_tar _w10">
-								<b>Gord</b><br> 0
+								<b>Gord</b><br> 
+								<small>{{ totalGord }}g<br> 0%</small>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 
-				<table class="Table _bordered">
+				<!-- Cardapios -->
+				<table class="Table _bordered" v-for="cardapio in cardapios">
 					<tbody>
 						<tr>
-							<td class="_align-middle">
+							<td class="_align-middle" colspan="2">
 								<h4 class="_mb0">
-									<span contenteditable>Café da manhã</span>
+									<span contenteditable>{{ cardapio.nome }}</span>
 									<button class="Button _mini"><i class="icon-trash"></i></button>
 								</h4>
 							</td>
 							<td class="_tar _w10">
-								<b>Calorias</b><br> 0 kcal
+								<b>Calorias</b><br> 
+								<small>{{ cardapio.totalCalorias }} kcal</small>
 							</td>
 							<td class="_tar _w10">
-								<b>Carb</b><br> 0
+								<b>Carb</b><br> 
+								<small>{{ cardapio.totalCarb }}g</small>
 							</td>
 							<td class="_tar _w10">
-								<b>Prot</b><br> 0
+								<b>Prot</b><br> 
+								<small>{{ cardapio.totalProt }}g</small>
 							</td>
 							<td class="_tar _w10">
-								<b>Gord</b><br> 0
+								<b>Gord</b><br> 
+								<small>{{ cardapio.totalGord }}g</small>
 							</td>
 						</tr>
 
-						<tr class="_align-middle">
-							<td colspan="3">Maçã</td>
+						<tr class="_align-middle" v-for="alimento in cardapio.alimentos">
 							<td>
-								<input type="text" placeholder="qtd">
-							</td>
-							<td class="_tac">
+								{{ alimento.nome }}
 								<button class="Button _mini"><i class="icon-trash"></i></button>
 							</td>
+							<td class="_w10"><input type="number" min="0" placeholder="qtd" v-model="alimento.qtd"></td>
+							<td class="_tar">{{ alimento.kcal * alimento.qtd }} kcal</td>
+							<td class="_tar">{{ alimento.carb * alimento.qtd }}g</td>
+							<td class="_tar">{{ alimento.prot * alimento.qtd }}g</td>
+							<td class="_tar">{{ alimento.gord * alimento.qtd }}g</td>
 						</tr>
 
 						<tr>
-							<td colspan="5">
+							<td colspan="6">
 								<a href="#">Adicionar alimento</a>
 							</td>
 						</tr>
@@ -81,7 +93,7 @@
 			</div>
 
 			<!-- Perfil -->
-			<div class="col _col-4">
+			<div class="col _col-3">
 				<h2>Perfil</h2>
 				<form class="Form">
 					<div class="form-item">
@@ -119,11 +131,11 @@
 						<label>Nível de atividade física</label>
 						<div>
 							<select v-model="perfil.atividade">
-								<option value="1.2">Sedentário</option>
-								<option value="1.375">Leve</option>
-								<option value="1.5">Moderado</option>
-								<option value="1.725">Alto</option>
-								<option value="1.9">Atleta</option>
+								<option value="sedentario">Sedentário</option>
+								<option value="esporadico">Exercícios esporádicos</option>
+								<option value="resistencia">Exercícios de resistência</option>
+								<option value="mistos">Exercícios mistos</option>
+								<option value="forca">Exercícios de força</option>
 							</select>
 						</div>
 					</div>
@@ -132,9 +144,9 @@
 						<label>Objetivo</label>
 						<div>
 							<select v-model="perfil.objetivo">
-								<option value="1.25">Ganhar peso</option>
-								<option value="1">Manter o peso</option>
-								<option value="0.75">Perder peso</option>
+								<option value="perder">Perder peso</option>
+								<option value="manter">Manter o peso</option>
+								<option value="ganhar">Ganhar peso</option>
 							</select>
 						</div>
 					</div>
@@ -149,12 +161,12 @@
 						</tr>
 
 						<tr>
-							<td><b>Consumo necessário de calorias</b></td>
+							<td><b>Total necessário</b></td>
 							<td class="_tar">{{ calorias.necessario }} kcal</td>
 						</tr>
 
 						<tr>
-							<td><b>Meta consumo de calorias</b></td>
+							<td><b>Meta</b></td>
 							<td class="_tar">{{ calorias.meta }} kcal</td>
 						</tr>
 					</tbody>
@@ -166,6 +178,30 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script>
+		const fatores = {
+			kcalTmbParaNecessarias: {
+				sedentario: 1.2,
+				esporadico: 1.375,
+				resistencia: 1.5,
+				mistos: 1.725,
+				forca: 1.9
+			},
+
+			kcalNecessariasParaMeta: {
+				perder: 0.75,
+				manter: 1,
+				ganhar: 1.25
+			},
+
+			proteinaParaGramas: {
+				sedentario: 0.8,
+				esporadico: 1,
+				resistencia: 1.6,
+				mistos: 1.7,
+				forca: 2,
+			}
+		};
+
 		var app = new Vue({
 
 			el: '#app',
@@ -176,35 +212,91 @@
 					peso: 0,
 					altura: 0,
 					genero: 'm',
-					atividade: 1.2,
-					objetivo: 1
-				}
+					atividade: 'sedentario',
+					objetivo: 'manter'
+				},
+
+				cardapios: [
+					{
+						nome: 'Café',
+						totalCalorias: 0,
+						totalCarb: 0,
+						totalProt: 0,
+						totalGord: 0,
+						alimentos: [
+							{
+								nome: 'Maçã',
+								qtd: 1,
+								kcal: 199,
+								carb: 10,
+								prot: 10,
+								gord: 10
+							},
+							{
+								nome: 'Banana',
+								qtd: 1,
+								kcal: 199,
+								carb: 20,
+								prot: 20,
+								gord: 20
+							}
+						]
+					}
+				],
+
+				totalCalorias: 0,
+				totalCarb: 0,
+				totalProt: 0,
+				totalGord: 0,
 			},
 
 			computed: {
 				calorias: function() {
-					let peso       = this.perfil.peso;
-					let altura     = this.perfil.altura;
-					let idade      = this.perfil.idade;
-					let genero     = this.perfil.genero;
-					let atividade  = this.perfil.atividade;
-					let objetivo   = this.perfil.objetivo;
-					let fator      = (genero == 'm') ? 5 : -161;
-					let tmb        = 0;
-					let necessario = 0;
-					let meta       = 0;
+					let peso           = this.perfil.peso;
+					let altura         = this.perfil.altura;
+					let idade          = this.perfil.idade;
+					let genero         = this.perfil.genero;
+					let atividade      = this.perfil.atividade;
+					let objetivo       = this.perfil.objetivo;
+					let fatorAtividade = fatores.kcalTmbParaNecessarias[atividade];
+					let fatorObjetivo  = fatores.kcalNecessariasParaMeta[objetivo];
+					let fatorTmb       = (genero == 'm') ? 5 : -161;
+					let tmb            = 0;
+					let necessario     = 0;
+					let meta           = 0;
 
 					if (peso && altura && idade) {
-						tmb        = (10 * peso) + (6.25 * altura) - (5 * idade) + fator;
+						tmb        = (10 * peso) + (6.25 * altura) - (5 * idade) + fatorTmb;
 						tmb        = Math.round(tmb);
-						necessario = Math.round(atividade * tmb);
-						meta       = Math.round(necessario * objetivo)
+						necessario = Math.round(tmb * fatorAtividade);
+						meta       = Math.round(necessario * fatorObjetivo)
 					}
 
 					return {
 						tmb: tmb,
 						necessario: necessario,
-						meta: meta,
+						meta: meta
+					}
+				},
+
+				meta: function() {
+					let carb          = 0;
+					let prot          = 0;
+					let gord          = 0;
+					let metaCalorias  = this.calorias.meta;
+					let peso          = this.perfil.peso;
+					let atividade     = this.perfil.atividade;
+					let fatorProteina = fatores.proteinaParaGramas[atividade];
+
+					if (metaCalorias) {
+						prot = Math.round(peso * fatorProteina);
+						gord = Math.round(peso * 1);
+					}
+
+					return {
+						carb: carb,
+						prot: prot,
+						gord: gord,
 					}
 				}
 			},
