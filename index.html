@@ -23,73 +23,73 @@
 							</td>
 							<td class="_tar _w10">
 								<b>Calorias</b><br> 
-								<small>{{ totalCalorias }} kcal<br> 0%</small>
+								<small>{{ totalKcal }} kcal<br> {{ percentuais.kcal }}%</small>
 							</td>
 							<td class="_tar _w10">
 								<b>Carb</b><br> 
-								<small>{{ totalCarb }}g<br> 0%</small>
-							</td>
-							<td class="_tar _w10">
-								<b>Prot</b><br> 
-								<small>{{ totalProt }}g<br> 0%</small>
+								<small>{{ totalCarb }}g<br> {{ percentuais.carb }}%</small>
 							</td>
 							<td class="_tar _w10">
 								<b>Gord</b><br> 
-								<small>{{ totalGord }}g<br> 0%</small>
+								<small>{{ totalGord }}g<br> {{ percentuais.gord }}%</small>
+							</td>
+							<td class="_tar _w10">
+								<b>Prot</b><br> 
+								<small>{{ totalProt }}g<br> {{ percentuais.prot }}%</small>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 
 				<!-- Cardapios -->
-				<table class="Table _bordered" v-for="cardapio in cardapios">
+				<table class="Table _bordered" v-for="refeicao, keyRefeicao in refeicoes">
 					<tbody>
 						<tr>
 							<td class="_align-middle" colspan="2">
 								<h4 class="_mb0">
-									<span contenteditable>{{ cardapio.nome }}</span>
-									<button class="Button _mini"><i class="icon-trash"></i></button>
+									<span contenteditable>{{ refeicao.nome }}</span>
+									<button class="Button _mini" @click="removerRefeicao(keyRefeicao)"><i class="icon-trash"></i></button>
 								</h4>
 							</td>
 							<td class="_tar _w10">
 								<b>Calorias</b><br> 
-								<small>{{ cardapio.totalCalorias }} kcal</small>
+								<small>{{ refeicao.totalKcal }} kcal</small>
 							</td>
 							<td class="_tar _w10">
 								<b>Carb</b><br> 
-								<small>{{ cardapio.totalCarb }}g</small>
-							</td>
-							<td class="_tar _w10">
-								<b>Prot</b><br> 
-								<small>{{ cardapio.totalProt }}g</small>
+								<small>{{ refeicao.totalCarb }}g</small>
 							</td>
 							<td class="_tar _w10">
 								<b>Gord</b><br> 
-								<small>{{ cardapio.totalGord }}g</small>
+								<small>{{ refeicao.totalGord }}g</small>
+							</td>
+							<td class="_tar _w10">
+								<b>Prot</b><br> 
+								<small>{{ refeicao.totalProt }}g</small>
 							</td>
 						</tr>
 
-						<tr class="_align-middle" v-for="alimento in cardapio.alimentos">
+						<tr class="_align-middle" v-for="alimento, keyAlimento in refeicao.alimentos">
 							<td>
 								{{ alimento.nome }}
-								<button class="Button _mini"><i class="icon-trash"></i></button>
+								<button class="Button _mini" @click="removerAlimento(keyRefeicao, keyAlimento)"><i class="icon-trash"></i></button>
 							</td>
-							<td class="_w10"><input type="number" min="0" placeholder="qtd" v-model="alimento.qtd"></td>
+							<td class="_w10"><input type="number" min="0" placeholder="qtd" v-model.number="alimento.qtd" @change="somaTudo"></td>
 							<td class="_tar">{{ alimento.kcal * alimento.qtd }} kcal</td>
 							<td class="_tar">{{ alimento.carb * alimento.qtd }}g</td>
-							<td class="_tar">{{ alimento.prot * alimento.qtd }}g</td>
 							<td class="_tar">{{ alimento.gord * alimento.qtd }}g</td>
+							<td class="_tar">{{ alimento.prot * alimento.qtd }}g</td>
 						</tr>
 
 						<tr>
 							<td colspan="6">
-								<a href="#">Adicionar alimento</a>
+								<a href="#" @click.prevent="showModalAdicionarAlimento(keyRefeicao)">Adicionar alimento</a>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 
-				<a class="Button" href="#">Adicionar refeição</a>
+				<a class="Button" href="#" @click.prevent="showModalAdicionarRefeicao">Adicionar refeição</a>
 			</div>
 
 			<!-- Perfil -->
@@ -167,10 +167,84 @@
 
 						<tr>
 							<td><b>Meta</b></td>
-							<td class="_tar">{{ calorias.meta }} kcal</td>
+							<td class="_tar">{{ metas.kcal }} kcal</td>
 						</tr>
 					</tbody>
 				</table>
+			</div>
+		</div>
+
+		<!-- Modals -->
+		<div class="Modals" v-if="showAdicionarRefeicao || showAdicionarAlimento">
+			<!-- Adicionar cardapio -->
+			<div class="modal adicionar-cardapio" v-if="showAdicionarRefeicao">
+				<h2>Adicionar refeição</h2>
+				<form class="Form" @submit.prevent="adicionarRefeicao">
+					<div class="form-item">
+						<label>Nome da refeição</label>
+						<div>
+							<input type="text" v-model.trim="modelRefeicao.nome" required>
+						</div>
+					</div>
+
+					<button class="Button" type="submit">Adicionar</button>
+					<button class="Button _secondary" @click.prevent="hideModal('Refeicao')">Cancelar</button>
+				</form>
+			</div>
+
+			<!-- Adicionar alimento -->
+			<div class="modal adicionar-alimento" v-if="showAdicionarAlimento">
+				<h2>Adicionar alimento</h2>
+				<form class="Form" @submit.prevent="adicionarAlimento">
+
+					<div class="form-item">
+						<label>Nome do alimento</label>
+						<div>
+							<input type="text" v-model.trim="modelAlimento.nome" required>
+						</div>
+					</div>
+
+					<div class="Row _gutters _auto">
+						<div class="col">
+							<div class="form-item">
+								<label>Calorias</label>
+								<div>
+									<input type="number" v-model.number="modelAlimento.kcal" required>
+								</div>
+							</div>
+						</div>
+
+						<div class="col">
+							<div class="form-item">
+								<label>Carb</label>
+								<div>
+									<input type="number" v-model.number="modelAlimento.carb" required>
+								</div>
+							</div>
+						</div>
+
+						<div class="col">
+							<div class="form-item">
+								<label>Gord</label>
+								<div>
+									<input type="number" v-model.number="modelAlimento.gord" required>
+								</div>
+							</div>
+						</div>
+						
+						<div class="col">
+							<div class="form-item">
+								<label>Prot</label>
+								<div>
+									<input type="number" v-model.number="modelAlimento.prot" required>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<button class="Button" type="submit">Adicionar</button>
+					<button class="Button _secondary" @click.prevent="hideModal('Alimento')">Cancelar</button>
+				</form>
 			</div>
 		</div>
 	</div>
@@ -178,6 +252,14 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script>
+		function cloneObj(obj) {
+			if (typeof obj === 'object') {
+				return JSON.parse(JSON.stringify(obj));
+			} else {
+				return {};
+			}
+		}
+
 		const fatores = {
 			kcalTmbParaNecessarias: {
 				sedentario: 1.2,
@@ -202,11 +284,37 @@
 			}
 		};
 
+		const modelRefeicao = {
+			nome: '',
+			totalKcal: 0,
+			totalCarb: 0,
+			totalProt: 0,
+			totalGord: 0,
+			alimentos: []
+		};
+
+		const modelAlimento = {
+			nome: 'Maçã',
+			qtd: 1,
+			kcal: 199,
+			carb: 10,
+			prot: 10,
+			gord: 10
+		};
+
 		var app = new Vue({
 
 			el: '#app',
 
 			data: {
+				showAdicionarRefeicao: false,
+				showAdicionarAlimento: false,
+
+				modelRefeicao: {},
+				modelAlimento: {},
+
+				currentKey: null,
+
 				perfil: {
 					idade: 0,
 					peso: 0,
@@ -216,35 +324,9 @@
 					objetivo: 'manter'
 				},
 
-				cardapios: [
-					{
-						nome: 'Café',
-						totalCalorias: 0,
-						totalCarb: 0,
-						totalProt: 0,
-						totalGord: 0,
-						alimentos: [
-							{
-								nome: 'Maçã',
-								qtd: 1,
-								kcal: 199,
-								carb: 10,
-								prot: 10,
-								gord: 10
-							},
-							{
-								nome: 'Banana',
-								qtd: 1,
-								kcal: 199,
-								carb: 20,
-								prot: 20,
-								gord: 20
-							}
-						]
-					}
-				],
+				refeicoes: [],
 
-				totalCalorias: 0,
+				totalKcal: 0,
 				totalCarb: 0,
 				totalProt: 0,
 				totalGord: 0,
@@ -257,9 +339,7 @@
 					let idade          = this.perfil.idade;
 					let genero         = this.perfil.genero;
 					let atividade      = this.perfil.atividade;
-					let objetivo       = this.perfil.objetivo;
 					let fatorAtividade = fatores.kcalTmbParaNecessarias[atividade];
-					let fatorObjetivo  = fatores.kcalNecessariasParaMeta[objetivo];
 					let fatorTmb       = (genero == 'm') ? 5 : -161;
 					let tmb            = 0;
 					let necessario     = 0;
@@ -269,7 +349,6 @@
 						tmb        = (10 * peso) + (6.25 * altura) - (5 * idade) + fatorTmb;
 						tmb        = Math.round(tmb);
 						necessario = Math.round(tmb * fatorAtividade);
-						meta       = Math.round(necessario * fatorObjetivo)
 					}
 
 					return {
@@ -279,21 +358,48 @@
 					}
 				},
 
-				meta: function() {
-					let carb          = 0;
-					let prot          = 0;
-					let gord          = 0;
-					let metaCalorias  = this.calorias.meta;
-					let peso          = this.perfil.peso;
-					let atividade     = this.perfil.atividade;
-					let fatorProteina = fatores.proteinaParaGramas[atividade];
+				metas: function() {
+					let kcal            = 0;
+					let carb            = 0;
+					let prot            = 0;
+					let gord            = 0;
+					let peso            = this.perfil.peso;
+					let atividade       = this.perfil.atividade;
+					let objetivo        = this.perfil.objetivo;
+					let kcalNecessarias = this.calorias.necessario;
+					let fatorObjetivo   = fatores.kcalNecessariasParaMeta[objetivo];
+					let fatorProteina   = fatores.proteinaParaGramas[atividade];
 
-					if (metaCalorias) {
+					if (kcalNecessarias) {
+						kcal = Math.round(kcalNecessarias * fatorObjetivo);
 						prot = Math.round(peso * fatorProteina);
 						gord = Math.round(peso * 1);
+						carb = Math.round( (kcal - ((prot * 4) + (gord * 9))) / 4 );
 					}
 
 					return {
+						kcal: kcal,
+						carb: carb,
+						prot: prot,
+						gord: gord,
+					}
+				},
+
+				percentuais: function() {
+					let kcal = 0;
+					let carb = 0;
+					let prot = 0;
+					let gord = 0;
+
+					if (this.metas.kcal) {
+						kcal = Math.round((this.totalKcal / this.metas.kcal) * 100);
+						carb = Math.round((this.totalCarb / this.metas.carb) * 100);
+						prot = Math.round((this.totalProt / this.metas.prot) * 100);
+						gord = Math.round((this.totalGord / this.metas.gord) * 100);
+					}
+
+					return {
+						kcal: kcal,
 						carb: carb,
 						prot: prot,
 						gord: gord,
@@ -302,6 +408,92 @@
 			},
 
 			methods: {
+				showModal: function(modal) {
+					this['showAdicionar' + modal] = true;
+					document.documentElement.style.overflow = 'hidden';
+				},
+
+				showModalAdicionarRefeicao: function() {
+					this.showModal('Refeicao');
+				},
+				
+				showModalAdicionarAlimento: function(keyRefeicao) {
+					this.currentKey = keyRefeicao;
+					this.showModal('Alimento');	
+				},
+
+				hideModal: function(event, modal) {
+					this['showAdicionar' + modal] = false;
+					document.documentElement.style.overflow = 'auto';
+				},
+
+				adicionarRefeicao: function() {
+					this.refeicoes.push(this.modelRefeicao);
+					this.hideModal(null, 'Refeicao');
+					this.modelRefeicao = cloneObj(modelRefeicao);
+				},
+
+				adicionarAlimento: function() {
+					let key = this.currentKey;
+					this.refeicoes[key].alimentos.push(this.modelAlimento);
+					this.hideModal(null, 'Alimento');
+					this.modelAlimento = cloneObj(modelAlimento);
+					this.somaTudo();
+				},
+
+				removerRefeicao: function(keyRefeicao) {
+					this.refeicoes.splice(keyRefeicao, 1);
+					this.somaTudo();
+				},
+
+				removerAlimento: function(keyRefeicao, keyAlimento) {
+					this.refeicoes[keyRefeicao].alimentos.splice(keyAlimento, 1);
+					this.somaTudo();
+				},
+
+				somaTudo: function() {
+					let totalKcal = 0;
+					let totalCarb = 0;
+					let totalProt = 0;
+					let totalGord = 0;
+
+					for (keyRefeicao in this.refeicoes) {
+						let refeicao = this.refeicoes[keyRefeicao];
+						refeicao.totalKcal = 0;
+						refeicao.totalCarb = 0;
+						refeicao.totalProt = 0;
+						refeicao.totalGord = 0;
+
+						for (keyAlimento in refeicao.alimentos) {
+							let alimento = refeicao.alimentos[keyAlimento];
+							let qtd = alimento.qtd;
+							let kcal = alimento.kcal;
+							let carb = alimento.carb;
+							let prot = alimento.prot;
+							let gord = alimento.gord;
+
+							refeicao.totalKcal += kcal * qtd;
+							refeicao.totalCarb += carb * qtd;
+							refeicao.totalProt += prot * qtd;
+							refeicao.totalGord += gord * qtd;
+						}
+
+						totalKcal += refeicao.totalKcal;
+						totalCarb += refeicao.totalCarb;
+						totalProt += refeicao.totalProt;
+						totalGord += refeicao.totalGord;
+					}
+
+					this.totalKcal = totalKcal;
+					this.totalCarb = totalCarb;
+					this.totalProt = totalProt;
+					this.totalGord = totalGord;
+				}
+			},
+
+			mounted: function () {
+				this.modelRefeicao = cloneObj(modelRefeicao);
+				this.modelAlimento = cloneObj(modelAlimento);
 			}
 
 		});
